@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  UserName:
+    Description: Enter the name for the IAM user
+    Type: String
+    Default: 'sreadarsh'
+
+Resources:
+
+  RoleForB:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::720957898934:root"
+            },
+            "Action": "sts:AssumeRole",
+            "Condition": {}
+        }
+    ]
+}
+      Description: A role for Account B to assume Administrator roles in Account A
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      RoleName: RoleAdminAccessOfAbyB
+
+  UserinA:
+    Type: AWS::IAM::User
+    Properties: 
+      LoginProfile: 
+        Password: Azerbaijan@123
+        PasswordResetRequired: False
+      UserName: !Ref UserName
+
+
+  PolicyforUserwithinA:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+                "ec2:CreateVpc",
+                "ec2:CreateSubnet",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:CreateRouteTable",
+                "ec2:CreateRoute",
+                "ec2:CreateInternetGateway",
+                "ec2:AttachInternetGateway",
+                "ec2:AssociateRouteTable",
+                "ec2:ModifyVpcAttribute",
+                "ec2:DeleteRouteTable",
+                "ec2:CreateRoute",
+                "ec2:ReplaceRoute",
+                "ec2:DeleteRoute",
+                "ec2:DeleteVpc",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteInternetGateway",
+            ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": "arn:aws:iam::720957898934:role/RoleVPCAccessOfBbyA"
+    },
+    {
+      "Action": "ec2:Describe*",
+      "Resource": "*",
+      "Effect": "Allow"
+    }
+  ]
+}
+      PolicyName: PolicyforUserwithinA
+      Users:
+        - !Ref UserinA

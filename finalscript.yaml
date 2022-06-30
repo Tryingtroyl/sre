@@ -1,0 +1,209 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  UsernameOne:
+    Description: Enter the name for the IAM user
+    Type: String
+    Default: 'Adarsh'
+  UsernameTwo:
+    Description: Enter the name for the IAM user
+    Type: String
+    Default: 'Balwda'
+  UsernameThree:
+    Description: Enter the name for the IAM user
+    Type: String
+    Default: 'Chandra'
+
+    
+
+Resources:
+
+  Adarsh:
+    Type: AWS::IAM::User
+    Properties: 
+      LoginProfile: 
+        Password: Azerbaijan@123
+        PasswordResetRequired: False
+      UserName: !Ref UsernameOne
+
+  Balwda:
+    Type: AWS::IAM::User
+    Properties: 
+      LoginProfile: 
+        Password: Bahrain@456
+        PasswordResetRequired: False
+      UserName: !Ref UsernameTwo
+
+  Chandra:
+    Type: AWS::IAM::User
+    Properties: 
+      LoginProfile: 
+        Password: Cyprus@789
+        PasswordResetRequired: False
+      UserName: !Ref UsernameThree
+
+  PolicyforAdarsh:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateVpc",
+                "ec2:CreateSubnet",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:CreateRouteTable",
+                "ec2:CreateRoute",
+                "ec2:CreateInternetGateway",
+                "ec2:AttachInternetGateway",
+                "ec2:AssociateRouteTable",
+                "ec2:ModifyVpcAttribute",
+                "ec2:DeleteRouteTable",
+                "ec2:CreateRoute",
+                "ec2:ReplaceRoute",
+                "ec2:DeleteRoute",
+                "ec2:DeleteVpc",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteInternetGateway"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+      PolicyName: PolicyForAdarsh
+      Users:
+        - !Ref Adarsh
+
+  PolicyforBalwda:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "ec2:*",
+            "Resource": "*",
+            "Condition" : { "StringEquals" : { "aws:username" : "Balwda" }}
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Deny",
+            "Action": [
+                "ec2:DeleteSubnet",
+                "ec2:DeleteRoute",
+                "ec2:CreateVpc",
+                "ec2:CreateRouteTable",
+                "ec2:AttachInternetGateway",
+                "ec2:ReplaceRoute",
+                "ec2:DeleteRouteTable",
+                "ec2:AssociateRouteTable",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:CreateRoute",
+                "ec2:CreateInternetGateway",
+                "ec2:ModifyVpcAttribute",
+                "ec2:DeleteInternetGateway",
+                "ec2:DeleteVpc",
+                "ec2:CreateSubnet"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+      PolicyName: PolicyForBalwda
+      Users:
+        - !Ref Balwda
+
+  PolicyforChandra:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "iam:*",
+            "Resource": [
+                "arn:aws:iam::566066428641:role/*",
+                "arn:aws:iam::566066428641:policy/*",
+                "arn:aws:iam::566066428641:user/Adarsh",
+                "arn:aws:iam::566066428641:user/Balwda"
+            ]
+        }
+    ]
+}
+      PolicyName: PolicyForChandra
+      Users:
+        - !Ref Chandra
+
+  SREGroupDemo:
+    Type: AWS::IAM::Group
+    Properties: 
+      GroupName: SREGroupDemo
+
+  PolicyforSREGroup:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument: {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListRoleTags",
+                "iam:ListPolicyVersions",
+                "iam:ListPolicyTags",
+                "iam:ListRolePolicies"
+            ],
+            "Resource": [
+                "arn:aws:iam::566066428641:role/*",
+                "arn:aws:iam::566066428641:policy/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListRoleTags",
+                "iam:ListPolicyVersions",
+                "iam:ListUserPolicies",
+                "iam:ListPolicyTags",
+                "iam:ListRolePolicies",
+                "iam:ListUserTags"
+            ],
+            "Resource": [
+                "arn:aws:iam::566066428641:user/Adarsh",
+                "arn:aws:iam::566066428641:user/Balwda",
+                "arn:aws:iam::566066428641:user/Chandra"
+            ]
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListPolicies",
+                "iam:ListRoles",
+                "iam:ListUsers",
+                "iam:ListGroups"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+      PolicyName: PolicyForSREGroup
+      Groups:
+        - !Ref SREGroupDemo
+
+  UserGroupAdd:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties: 
+      GroupName: !Ref SREGroupDemo
+      Users: 
+        - !Ref Adarsh
+        - !Ref Balwda
+        - !Ref Chandra
